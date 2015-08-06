@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>计算器</title>
+	<style>
+	body,input,p,ul,li {margin:0; padding:0;color:#fff;}
+	#div {width:300px; margin:20px auto; font:700 24px/1.5 Arial; position:relative;}
+
+	ul {float: left;background: url(../练习/img/ul.jpg); padding: 18px 0 0 10px; position: relative; }
+
+	li {list-style: none; width:62px; height:38px; background: #272727; text-align:center; line-height:38px; float: left;margin:0 10px 20px 0; cursor:pointer; }
+
+	p{font:bold 14px/1.5 Arial; background: #000; text-align: right}
+
+	.btn_1 {background: url(../练习/img/btn.png) no-repeat;}
+	.btn_1:hover {background-position: -62px 0;}
+
+	.btn_2 {background: url(../练习/img/btn.png)no-repeat 0 -41px; }
+	.btn_2:hover {background-position: -62px -41px;}
+
+	.btn_3 {width:135px; background: url(../练习/img/btn.png) no-repeat 0 -83px;}
+	.btn_3:hover {background-position: 0 -121px;}
+
+	.btn_4 {height:94px; position: absolute;right: 0; bottom: 0; line-height:94px; background: url(../练习/img/btn.png) no-repeat 0 -166px;}
+	.btn_4:hover {background-position: -63px -166px;}
+	#text {width:300px; height:84px; border:none; background: url(../练习/img/inputBg.jpg) repeat-x; color:#000;  text-align: right;  font: 700 50px/84px Arial;}
+	#result {width:280px;padding-left:10px;  text-align:right;  height:20px;border:none; background: none; position: absolute; top: 21px; left:0; color:#666;}
+	</style>
+	<script>
+	window.onload=function()
+	{
+		var s=false;   //这是用来判断oText.value是不是结果；
+		var re=/[\%\/\*\-\+]/;  
+		var oText=document.getElementById('text'); //大的输入框，
+		var oResult=document.getElementById('result');//小的输入框
+		var aLi=document.getElementsByTagName('li'); //各种按钮；
+
+		for(var i=0,len=aLi.length; i<len;i++)
+		{
+			aLi[i].index=i;
+			aLi[i].onclick=function()
+			{
+			var digit=this.innerHTML;
+			switch(digit){  
+			case 'c':  
+			 	oText.value='0';
+			 	oResult.value='';
+			break;  
+			case '%':  
+			    operation('%');
+			break;  
+			case '÷':
+				operation('/');
+			break;  
+			case '×': 									//这是在判断输入的是数字还是运算符；然后根据输入的内容做各种操作和运算；operation()这是运算的函数；
+			  	operation('*'); 
+			break;
+			case '+': 
+			  	operation('+');
+			break;
+			case '-': 
+			  	operation('-'); 
+			break;
+
+
+			case '=': 
+				if(re.test(oResult.value.charAt(oResult.value.length-1))==false)  
+				{
+					oResult.value=oText.value; //这是判断小的输入框后面是不是有运算符，如果没有就让小的输入框的value变成大的输入框的value
+				}
+				else if(re.test(oText.value)&&re.test(oResult.value.charAt(oResult.value.length-1)))
+				{
+					alert('你按错了，请从新输入');  //这是用来解决，如果小的输入框的value的最后一个是运算符的话 ，大的输入框的value也是运算符， 一按=号，小的输入框的value就会出现多个运算符不能计算的bug；
+					oText.value='0';
+				}
+				else
+				{
+					oResult.value=oResult.value+=oText.value;  //这是得到一个完整的算式，然后用eval计算再把它赋值给大的输入框的
+				}
+			  	oText.value=eval(oResult.value); 
+			  	s=true;  //这是为了让下面可以判断大的输入框的是不是结果； 
+			break;
+
+
+			default:
+				if(oText.value=='0'||re.test(oText.value))
+				{
+					oText.value=digit; //这里是说如果输入的数字的话，就判断一下大的输入框是不是0；是0就让大的输入框直接等于输入的数字；如果不是0就加等于输入的数字；
+				}
+				else
+				{
+					oText.value+=digit;
+				}
+			};
+
+
+
+			function operation(c) 
+			{
+				var oR_va=oResult.value;
+				if(re.test(oR_va.charAt(oR_va.length-1))&&/[^\d]/.test(oText.value))
+				{
+					
+					oResult.value=oR_va.substring(0,oR_va.length-1)+c;  //这个程序是这样的，如果用户一按下运算符的话，小的输入框就会把大的输入框里面的文字拿过来，小的输入框的文字就是这样的  6+  如果现在用户再按下+号的话程序就出错计算不了； 所以这里判断一下，是不是按了两次；是的就让后面一个把前面一个覆盖掉；
+					oText.value=c;
+				}
+				else if(s)
+				{
+					oResult.value=oText.value;
+					oText.value=c;                 //这里是说如果大的输入框是计算过的结果，就用小的输入框存起来；再进行计算；
+					oResult.value+=oText.value;
+					s=false;
+				}
+				else
+				{
+					oResult.value+=oText.value+c; //这是说都不是上面的情况就是正常的把运算符加等于它；
+					oText.value=c;
+				};	
+			};
+		};
+	};
+}
+	</script>
+
+</head>
+<body>
+<div id="div">
+	<p>QQ:1781233929</p>
+	<input id="text" type="text" value="0"/>
+	<ul>
+		<li class="btn_2">c</li>
+		<li class="btn_2">%</li>
+		<li class="btn_2">÷</li>
+		<li class="btn_2">×</li>
+		<li class="btn_1">7</li>
+		<li class="btn_1">8</li>
+		<li class="btn_1">9</li>
+		<li class="btn_2">-</li>
+		<li class="btn_1">4</li>
+		<li class="btn_1">5</li>
+		<li class="btn_1">6</li>
+		<li class="btn_2">+</li>
+		<li class="btn_1">1</li>
+		<li class="btn_1">2</li>
+		<li class="btn_1">3</li>
+		<li class="btn_4">=</li>
+		<li class="btn_3">0</li>
+		<li class="btn_1">.</li>
+	</ul>
+	<input id="result" type="text" >
+</div>	
+</body>
+</html>
